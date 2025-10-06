@@ -1,5 +1,10 @@
 FROM debian:trixie-slim
 
+ARG COMMIT_SHA
+
+LABEL org.opencontainers.image.authors="rpfilomeno"
+LABEL org.opencontainers.image.url="https://github.com/rpfilomeno/warp-socks5"
+LABEL COMMIT_SHA=${COMMIT_SHA}
 # Install dependencies
 RUN apt-get update && \
     apt-get install -y \
@@ -18,35 +23,26 @@ RUN apt-get update && \
     apt-get install -y cloudflare-warp && \
     rm -rf /var/lib/apt/lists/*
 
-# Create startup script
-RUN echo '#!/bin/bash\n\
-set -e\n\
-\n\
-# Start warp-svc daemon in background\n\
-warp-svc &\n\
-sleep 2\n\
-\n\
-# Register and connect to WARP\n\
-warp-cli --accept-tos register || true\n\
-sleep 1\n\
-\n\
-# Set proxy mode to SOCKS5 on port 1080\n\
-warp-cli --accept-tos set-mode proxy\n\
-warp-cli --accept-tos set-proxy-port 1080\n\
-sleep 1\n\
-\n\
-# Connect to WARP\n\
-warp-cli --accept-tos connect\n\
-sleep 2\n\
-\n\
-echo "Cloudflare WARP SOCKS5 proxy is running on port 1080"\n\
-\n\
-# Keep container running and monitor warp-svc\n\
-tail -f /dev/null' > /start.sh && \
-    chmod +x /start.sh
+    
 
-# Expose SOCKS5 proxy port
-EXPOSE 1080
+RUN curl -LO https://github.com/ginuerzh/gost/releases/download/v2.12.0/gost_2.12.0_linux_amd64v3.tar.gz && \
+    tar -xzf gost_2.12.0_linux_amd64v3.tar.gz -C /usr/bin/ gost && \
+    chmod +x /usr/bin/gost && \
+    rm -rf gost_2.12.0_linux_amd64v3.tar.gz
+
+# Create startup script
+COPY entrypoint.sh /entrypoint.sh
+# Create health check script
+COPY health-check.sh /health-check.sh
+
+RUN chmod +x /health-check.sh && \
+    chmod +x /entrypoint.sh
+
+
+ENV GOST_ARGS="-L :1080"
 
 # Run the startup script
-CMD ["/start.sh"]
+HEALTHCHECK --interval=15s --timeout=5s --start-period=10s --retries=3 \
+  CMD /health-check.sh
+
+ENTRYPOINT ["/entrypoint.sh"]

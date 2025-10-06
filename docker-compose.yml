@@ -23,13 +23,7 @@ services:
     volumes:
       - ./warp-data:/var/lib/cloudflare-warp
     
-    # Healthcheck to ensure WARP is connected
-    healthcheck:
-      test: ["CMD", "warp-cli", "status"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 10s
+
 
 # Optional: join with other container network
 networks:
