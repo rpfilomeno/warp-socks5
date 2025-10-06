@@ -4,6 +4,8 @@ services:
     #build: .
     image: rpfilomeno/warp
     restart: unless-stopped
+    environment:
+      - TZ=Asia/Manila
     
     # Required capabilities for WARP
     cap_add:
@@ -23,12 +25,9 @@ services:
     # Optional: persist WARP configuration
     volumes:
       - ./warp-data:/var/lib/cloudflare-warp
+    logging:
+          options:
+            max-size: "10m"
+            max-file: "3"
     
 
-
-# Optional: join with other container network
-networks:
-  local-services:
-    # Specify driver options
-    driver: bridge
-    external: true
