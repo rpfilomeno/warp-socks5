@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  warp-socks5:
+    build: .
+    container_name: warp-proxy
+    restart: unless-stopped
+    
+    # Required capabilities for WARP
+    cap_add:
+      - NET_ADMIN
+    
+    # System controls for IPv6
+    sysctls:
+      - net.ipv6.conf.all.disable_ipv6=0
+      - net.ipv4.conf.all.src_valid_mark=1
+    
+    # Expose SOCKS5 proxy port
+    ports:
+      - "1080:1080"
+    
+    # Optional: persist WARP configuration
+    volumes:
+      - warp-data:/var/lib/cloudflare-warp
+    
+    # Healthcheck to ensure WARP is connected
+    healthcheck:
+      test: ["CMD", "warp-cli", "status"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+volumes:
+  warp-data:
+    driver: local
