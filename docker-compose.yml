@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   warp-socks5:
     build: .
@@ -14,6 +12,8 @@ services:
     sysctls:
       - net.ipv6.conf.all.disable_ipv6=0
       - net.ipv4.conf.all.src_valid_mark=1
+    networks:
+      - local-services
     
     # Expose SOCKS5 proxy port
     ports:
@@ -21,16 +21,13 @@ services:
     
     # Optional: persist WARP configuration
     volumes:
-      - warp-data:/var/lib/cloudflare-warp
+      - ./warp-data:/var/lib/cloudflare-warp
     
-    # Healthcheck to ensure WARP is connected
-    healthcheck:
-      test: ["CMD", "warp-cli", "status"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 10s
 
-volumes:
-  warp-data:
-    driver: local
+
+# Optional: join with other container network
+networks:
+  local-services:
+    # Specify driver options
+    driver: bridge
+    external: true
