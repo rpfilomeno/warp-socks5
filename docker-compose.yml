@@ -1,6 +1,6 @@
 services:
-  warp-socks5:
-    build: .
+  warp:
+    image: rpfilomeno/warp
     container_name: warp-proxy
     restart: unless-stopped
     
