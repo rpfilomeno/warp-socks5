@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/bash
 set -e
 
 # create a tun device if not exist
@@ -30,7 +30,7 @@ warp-cli --accept-tos mode warp
 warp-cli --accept-tos connect
 
 # wait another seconds for the daemon to reconfigure
-sleep 10
+sleep 5
 
 # enable NAT
 echo "[NAT] Enabling NAT..."
