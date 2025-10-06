@@ -5,6 +5,10 @@ ARG COMMIT_SHA
 LABEL org.opencontainers.image.authors="rpfilomeno"
 LABEL org.opencontainers.image.url="https://github.com/rpfilomeno/warp-socks5"
 LABEL COMMIT_SHA=${COMMIT_SHA}
+
+# Create startup script
+
+
 # Install dependencies
 RUN apt-get update && \
     apt-get install -y \
@@ -30,13 +34,12 @@ RUN curl -LO https://github.com/ginuerzh/gost/releases/download/v2.12.0/gost_2.1
     chmod +x /usr/bin/gost && \
     rm -rf gost_2.12.0_linux_amd64v3.tar.gz
 
-# Create startup script
-COPY entrypoint.sh /entrypoint.sh
-# Create health check script
-COPY health-check.sh /health-check.sh
+WORKDIR /app
 
-RUN chmod +x /health-check.sh && \
-    chmod +x /entrypoint.sh
+COPY . .
+
+RUN chmod +x health-check.sh
+RUN chmod +x entrypoint.sh
 
 
 ENV GOST_ARGS="-L :1080"
@@ -45,4 +48,6 @@ ENV GOST_ARGS="-L :1080"
 HEALTHCHECK --interval=15s --timeout=5s --start-period=10s --retries=3 \
   CMD /health-check.sh
 
-ENTRYPOINT ["/entrypoint.sh"]
+
+
+ENTRYPOINT ["./entrypoint.sh"]
