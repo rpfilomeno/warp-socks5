@@ -2,6 +2,20 @@
 
 A Docker container running Cloudflare WARP as a SOCKS5 proxy, allowing other containers and applications to route their traffic through Cloudflare's network.
 
+[![Docker Pulls](https://img.shields.io/docker/pulls/rpfilomeno/warp)](https://hub.docker.com/r/rpfilomeno/warp)
+
+``bash
+docker run -d \
+    --name warp-proxy \
+    --restart unless-stopped \
+    --cap-add=NET_ADMIN \
+    --sysctl net.ipv6.conf.all.disable_ipv6=0 \
+    --sysctl net.ipv4.conf.all.src_valid_mark=1 \
+    -p 1080:1080 \
+    -v "$(pwd)/warp-data":/var/lib/cloudflare-warp \
+    /warp
+``
+
 ## Features
 
 - 🚀 Easy setup with Docker Compose
