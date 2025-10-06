@@ -1,7 +1,8 @@
+name: warp
 services:
-  warp:
+  warp-proxy:
+    #build: .
     image: rpfilomeno/warp
-    container_name: warp-proxy
     restart: unless-stopped
     
     # Required capabilities for WARP
