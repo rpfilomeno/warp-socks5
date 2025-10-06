@@ -61,6 +61,7 @@ services:
       - ALL_PROXY=socks5h://warp-socks5:1080
       - HTTPS_PROXY=socks5h://warp-socks5:1080
       - HTTP_PROXY=socks5h://warp-socks5:1080
+      - NO_PROXY=localhost,127.0.0.1,.local,.internal
     depends_on:
       warp-socks5:
         condition: service_healthy
